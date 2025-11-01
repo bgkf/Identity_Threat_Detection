@@ -1,0 +1,33 @@
+title: Admin Role Assigned to a Group
+description: |
+  Detects when a group is grantend an admin privilege.
+references:
+  - 
+threat:
+  Tactic:
+    - TA0004 Privilege Escalation
+  Technique:
+    - T1098: Account Manipulation
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where %"eventType" = "group.privilege.grant"
+    | json field=_raw "debugContext.debugData.privilegeGranted" as privilege
+    | json field=_raw "target[0].displayName" as target
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, privilege, target, _source
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "group.privilege.grant" 
+false_positives:
+  - Legitimate role based access group granted an admin privilege.
