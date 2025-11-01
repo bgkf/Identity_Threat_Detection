@@ -1,6 +1,6 @@
 title: Admin Role Assignment Created
 description: |
-  Detects when an admin role is assigned.
+  Detects when a new admin role assignment is created.
 references:
   - 
 threat:
@@ -33,4 +33,4 @@ detection:
   okta_systemlog_query: |
     eventType eq "iam.resourceset.bindings.add"
 false_positives:
-  - Legitimate admin role assigned.
+  - Legitimate creation of a new admin role assignment.
