@@ -1,0 +1,36 @@
+title: Admin Role Create or Update
+description: |
+  Detects when an admin role is created or updated. 
+references:
+  - 
+threat:
+  Tactic:
+    - 
+  Technique:
+    - T1
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType
+    | where (("eventType" = "iam.role.update") or (eventtype = "iam.role.create"))
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "target[0].displayName" as roleName
+    | json field=_raw "target[1].displayName" as permissionName_1
+    | json field=_raw "target[2].displayName" as permissionName_2
+    | json field=_raw "outcome.result" as outcomeResult
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, target, _source, outcomeResult
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq iam.role.update or eventType eq iam.role.create
+false_positives:
+  - 
