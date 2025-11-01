@@ -13,7 +13,7 @@ prevention:
   D3fend:
     -  
 detection:
-  sumologic_log_search: |-
+  sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
 
     // Extract core fields
@@ -27,7 +27,7 @@ detection:
     | count by timestamp, actor_ID, actor_displayName, eventType, _source, outcomeResult
     | sort by timestamp desc
 
-  okta_systemlog_query: |-
+  okta_systemlog_query: |
       eventType eq "user.session.access_admin_app" AND outcome.result eq "FAILURE"
 false_positives:
   - 
