@@ -2,15 +2,19 @@ title: New Behaviors During Access to Okta Admin Console
 description: |
   Alerts when a new behavior is reported when accessing the admin console app.
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/security/proc-security-behavior-detection.htm
 threat:
   Tactic:
-    - 
+    - TA0001: Initial Access
   Technique:
-    - T1
+    - T1078: Valid Accounts
 prevention:
+  Mitigation:
+    - M1032: Multi-Factor Authentication (MFA)
+    - M1027: Password Policies
+    - M1018: User Account Management
   D3fend:
-    - 
+    - D3-UBA (User Behavior Analysis)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
@@ -48,4 +52,4 @@ detection:
     eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and debugContext.debugData.behaviors co "POSITIVE"
     eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and debugContext.debugData.LogOnlySecurityData co "POSITIVE"
 false_positives:
-  - Legitimate new behavior when the admin console is accessed.
+  - A user may be using a new device or location to sign in.
