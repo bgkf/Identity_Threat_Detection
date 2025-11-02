@@ -1,8 +1,8 @@
 title: Security Threat Detected
 description: |
-  Alerts when Okta detects a security threat.
+  Alerts when Okta detects a request that is deemed a high threat.
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/security/threat-insight/configure-threatinsight-system-log.htm
 threat:
   Tactic:
     - TA0001: Initial Access
@@ -12,7 +12,7 @@ threat:
     - T1078: Valid Accounts
 prevention:
   D3fend:
-    - 
+    - D3-APA (Access Policy Administration)
 detection:
   sumologic_log_search: |
   # This log search lacks details because I have not been able to test it.
