@@ -5,12 +5,19 @@ references:
   - 
 threat:
   Tactic:
-    - 
+    - TA0003: Persistence
   Technique:
-    - T1
+    - T1556: Modify Authentication Process
+    - T1556.006: Multi-Factor Authentication
+    - T1098: Account Manipulation
 prevention:
+  Mitigation:
+    - M1032: Multi-Factor Authentication (MFA)
+    - M1027: Password Policies
+    - M1018: User Account Management
   D3fend:
-    - 
+    - D3-AA (Agent Authentication)
+    - D3-CH (Credential Hardening)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
