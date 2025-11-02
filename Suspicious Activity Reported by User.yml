@@ -1,6 +1,6 @@
 title: Suspicious Activity Reported by User
 description: |
-  Detects when a user reports suspicious activity via a link in an email from Okta.
+  Alerts when a user reports unrecognized activity from Okta email notifications about account activity.
 references:
   - 
 threat:
@@ -11,8 +11,14 @@ threat:
     - T1078: Valid Accounts
     - T1539: Steal Web Session Cookie
 prevention:
+  Mitigation:
+    - M1032: Multi-Factor Authentication (MFA)
+    - M1027: Password Policies
+    - M1018: User Account Management
   D3fend:
-    - 
+    - D3-AA (Agent Authentication)
+    - D3-CH (Credential Hardening)
+    - D3-UBA (User Behavior Analysis)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
