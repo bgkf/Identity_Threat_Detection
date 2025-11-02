@@ -2,7 +2,7 @@ title: Admin Role Assignment Created
 description: |
   Detects when a new admin role assignment is created.
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/security/custom-admin-role/about-creating-custom-admin-roles.htm
 threat:
   Tactic:
     - TA0004: Privilege Escalation
@@ -10,6 +10,9 @@ threat:
     - T1078: Valid Accounts
     - T1098: Account Manipulation
 prevention:
+  Mitigation:
+    - M1032: Multi-factor Authentication
+    - M1018: User Account Management
   D3fend:
     - 
 detection:
