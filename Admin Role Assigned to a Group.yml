@@ -2,13 +2,16 @@ title: Admin Role Assigned to a Group
 description: |
   Detects when a group is grantend an admin privilege.
 references:
-  - 
+  - https://support.okta.com/help/s/article/How-to-assign-Administrator-roles-to-groups?language=en_US
 threat:
   Tactic:
-    - TA0004 Privilege Escalation
+    - TA0004: Privilege Escalation
   Technique:
     - T1098: Account Manipulation
 prevention:
+  Mitigation:
+    - M1032: Multi-Factor Authentication (MFA)
+    - M1018: User Account Management
   D3fend:
     - 
 detection:
