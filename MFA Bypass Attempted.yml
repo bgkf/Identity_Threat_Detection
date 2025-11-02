@@ -1,8 +1,9 @@
 title: MFA Bypass Attempted
 description: |
-  Detects when an MFA bypass is attempted.
+  Detects when a bypass of a MFA factor may have been attempted for a user.
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/reports/suspicious-activity-report.htm
+  - https://support.okta.com/help/s/article/system-log-attempt-bypass-of-factor
 threat:
   Tactic:
     - TA0006: Credential Access
@@ -28,4 +29,4 @@ detection:
   okta_systemlog_query: |
     eventType eq "user.mfa.attempt_bypass"
 false_positives:
-  - 
+  - System error.
