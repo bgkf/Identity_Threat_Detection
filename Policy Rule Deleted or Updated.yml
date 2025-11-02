@@ -1,0 +1,36 @@
+title: Policy Rule Deleted or Updated
+description: |
+  Detects when an authentication rule is updated or deleted.
+references:
+  - 
+threat:
+  Tactic:
+    - TA0004: Privilege Escalation
+    - TA0005: Defense Evasion
+  Technique:
+    - T1484: Domain Policy Modification
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType
+    | where ((%"eventType" = "policy.rule.update") or (%"eventType" = "policy.rule.delete")) 
+    | json field=_raw "target[0].displayName" as policyName
+    | json field=_raw "target[1].displayName" as ruleName
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "outcome.result" as outcomeResult
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, policyName, ruleName, _source, outcomeResult 
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "policy.rule.delete" OR eventType eq "policy.rule.update"
+false_positives:
+  - Legitimate authentication rule update or delete.
