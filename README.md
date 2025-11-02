@@ -1,5 +1,5 @@
 ### Identity Threat Detection
-Sumologic log searches to detect IAM threats in the Okta logs.
+Sumologic log searches used to alert when IAM threats are reported in the Okta logs.
 <br><br>
 
 #### References
