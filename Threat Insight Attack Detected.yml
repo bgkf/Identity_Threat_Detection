@@ -1,16 +1,27 @@
 title: Threat Insight Attack Detected
 description: |
-  Alerts when threat Insight detects an attack start and stop.
+  Okta ThreatInsight aggregates data about sign-in activity across the Okta customer base to analyze and detect potentially malicious IP addresses and to prevent credential-based attacks such as:
+	  - password spraying
+	  - credential stuffing
+	  - brute-force cryptographic attacks
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/security/threat-insight/about-threatinsight.htm
 threat:
   Tactic:
-    - 
+    - TA0001: Initial Access
+    - TA0006: Credential Acces
   Technique:
-    - 
+    - T1110: Brute Force
+    - T1078: Valid Accounts
 prevention:
+  Mitigation:
+    - M1032: Multi-Factor Authentication (MFA)
+    - M1027: Password Policies
+    - M1018: User Account Management
   D3fend:
-    - 
+    - D3-AA (Agent Authentication)
+    - D3-CH (Credential Hardening)
+    - D3-UBA (User Behavior Analysis)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
