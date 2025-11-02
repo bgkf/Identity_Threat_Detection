@@ -9,8 +9,10 @@ threat:
   Technique:
     - T1552: Unsecured Credentials
 prevention:
+  Mitigation:
+    - M1027: Password Policies
   D3fend:
-    - 
+    - D3-UBA (User Behavior Analysis)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
