@@ -1,0 +1,34 @@
+title: User Risk Changed or Detected
+description: |
+  Alerts when a user risk is detected or there is a change to a user risk.
+references:
+  - 
+threat:
+  Tactic:
+    - 
+  Technique:
+    - 
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType
+    | where ((eventType = "user.risk.change") or (eventType = "user.risk.detect")) 
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "outcome.result" as outcomeResult
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, _source, outcomeResult 
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "user.risk.detect"
+    eventType eq "user.risk.change"
+false_positives:
+  - 
