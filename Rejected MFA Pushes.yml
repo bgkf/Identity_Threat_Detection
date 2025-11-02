@@ -5,12 +5,13 @@ references:
   - 
 threat:
   Tactic:
-    - 
+    - TA0006: Credential Access
   Technique:
-    - T
+    - T1621: Multi-Factor Authentication Request Generation
 prevention:
   D3fend:
-    - 
+    - D3-AA (Agent Authentication)
+    - D3-CH (Credential Hardening)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
@@ -31,4 +32,4 @@ detection:
   okta_systemlog_query: |
     eventType eq "user.authentication.auth_via_mfa" and debugContext.debugData.pushOnlyResponseType eq "OV_RESPONSE_DENY"
 false_positives:
-  - 
+  - Legitimate push generated and rejected by user.
