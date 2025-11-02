@@ -1,0 +1,31 @@
+title: MFA Bypass Attempted
+description: |
+  Detects when an MFA bypass is attempted.
+references:
+  - 
+threat:
+  Tactic:
+    - TA0006: Credential Access
+  Technique:
+    - T1111: Two Factor Authentication Interception
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where %"eventType" = "user.mfa.attempt_bypass"
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, outcomeResult, _source
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "user.mfa.attempt_bypass"
+false_positives:
+  - 
