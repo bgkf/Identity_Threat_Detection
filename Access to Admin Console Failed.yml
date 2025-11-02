@@ -6,9 +6,9 @@ references:
   - 
 threat:
   tactic:
-    - 
+    - TA0001: Initial Access
   technique:
-    - T1078 Valid Accounts
+    - T1078: Valid Accounts
 prevention:
   D3fend:
     -  
@@ -30,4 +30,4 @@ detection:
   okta_systemlog_query: |
       eventType eq "user.session.access_admin_app" AND outcome.result eq "FAILURE"
 false_positives:
-  - 
+  - Legitimate authentication failure.
