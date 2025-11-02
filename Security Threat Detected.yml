@@ -1,0 +1,32 @@
+title: Security Threat Detected
+description: |
+  Alerts when Okta detects a security threat.
+references:
+  - 
+threat:
+  Tactic:
+    - TA0001: Initial Access
+    - TA0006: Credential Access
+  Technique:
+    - T1110: Brute Force
+    - T1078: Valid Accounts
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+  # This log search lacks details because I have not been able to test it.
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where %"eventType" = "security.threat.detected"
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, eventType, _source
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "security.threat.detected"
+false_positives:
+  - 
