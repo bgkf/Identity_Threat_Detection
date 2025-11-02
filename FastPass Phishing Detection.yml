@@ -1,0 +1,35 @@
+title: FastPass Phishing Detection
+description: |
+  Detects when a phishing attempt is rejected by FastPass.
+references:
+  - https://sec.okta.com/fastpassphishingdetection
+threat:
+  Tactic:
+    - TA0001: Initial Access
+    - TA0006: Credential Access
+  Technique:
+    - T1566: Phishing
+    - T1111: Two Factor Authentication Interception
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where %"eventType" = "user.authentication.auth_via_mfa"
+    | json field=_raw "outcome.reason" as outcomeReason | where outcomeReason = "FAILURE"
+    | json field=_raw "outcome.result" as outcomeResult | where outcomeResult = "FastPass declined phishing attempt"
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, outcomeReason, outcomeResult, _source
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "user.authentication.auth_via_mfa" and outcome.result eq "FAILURE" and outcome.reason eq "FastPass declined phishing attempt"
+false_positives:
+  - 
