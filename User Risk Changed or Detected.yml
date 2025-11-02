@@ -1,8 +1,8 @@
 title: User Risk Changed or Detected
 description: |
-  Alerts when a user risk is detected or there is a change to a user risk.
+  Alerts when a user risk is detected or there is a change to a user risk. Risk scoring uses a data-driven risk engine to determine whether a sign-in event is likely to represent malicious activity.
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/security/security_risk_scoring.htm
 threat:
   Tactic:
     - 
@@ -10,7 +10,7 @@ threat:
     - 
 prevention:
   D3fend:
-    - 
+    - D3-UBA (User Behavior Analysis)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
@@ -31,4 +31,4 @@ detection:
     eventType eq "user.risk.detect"
     eventType eq "user.risk.change"
 false_positives:
-  - 
+  - A user may be using a new device or location to sign in.
