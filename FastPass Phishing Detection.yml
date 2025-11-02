@@ -1,8 +1,10 @@
 title: FastPass Phishing Detection
 description: |
-  Detects when a phishing attempt is rejected by FastPass.
+  Detects when users enrolled in FastPass are targeted by a AiTM phishing attempt.
 references:
-  - https://sec.okta.com/fastpassphishingdetection
+  - https://sec.okta.com/articles/fastpassphishingdetection/
+  - https://www.obsidiansecurity.com/blog/behind-the-shield-cracking-the-limits-of-okta-fastpass
+  - https://help.okta.com/oie/en-us/content/topics/identity-engine/authenticators/phishing-resistant-auth.htm
 threat:
   Tactic:
     - TA0001: Initial Access
@@ -12,7 +14,7 @@ threat:
     - T1111: Two Factor Authentication Interception
 prevention:
   D3fend:
-    - 
+    - D3-AA (Agent Authentication)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
