@@ -2,16 +2,17 @@ title: Policy Rule Deleted or Updated
 description: |
   Detects when an authentication rule is updated or deleted.
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm
 threat:
   Tactic:
     - TA0004: Privilege Escalation
     - TA0005: Defense Evasion
   Technique:
     - T1484: Domain Policy Modification
+    - T1562: Impair Defenses
 prevention:
   D3fend:
-    - 
+    - D3-APA (Access Policy Administration)
 detection:
   sumologic_log_search: |
     (_source=Okta or _source="Okta Preview")
