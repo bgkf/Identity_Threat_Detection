@@ -1,0 +1,42 @@
+title: Suspicious Activity Reported by User
+description: |
+  Detects when a user reports suspicious activity via a link in an email from Okta.
+references:
+  - 
+threat:
+  Tactic:
+    - TA0001: Initial Access
+- TA0006: Credential Access
+  Technique:
+    - T1078: Valid Accounts
+    - T1539: Steal Web Session Cookie
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where eventType = "user.account.report_suspicious_activity_by_enduser" 
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "debugContext.debugData.suspiciousActivityTimestamp" as suspiciousActivityTimestamp
+    | json field=_raw "debugContext.debugData.suspiciousActivityEventType" as suspiciousActivityEventType
+    | json field=_raw "debugContext.debugData.suspiciousActivityEventIp" as suspiciousActivityEventIp
+    | json field=_raw "debugContext.debugData.suspiciousActivityEventCity" as suspiciousActivityEventCity
+    | json field=_raw "debugContext.debugData.suspiciousActivityEventState" as suspiciousActivityEventState
+    | json field=_raw "debugContext.debugData.suspiciousActivityEventCountry" as suspiciousActivityEventCountry
+    | json field=_raw "debugContext.debugData.suspiciousActivityBrowser" as suspiciousActivityBrowser
+    | json field=_raw "debugContext.debugData.suspiciousActivityOs" as suspiciousActivityOs
+    | json field=_raw "outcome.result" as outcomeResult
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, _source, suspiciousActivityEventType
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "user.account.report_suspicious_activity_by_enduser"
+false_positives:
+  - 
