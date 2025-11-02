@@ -1,0 +1,51 @@
+title: New Behaviors During Access to Okta Admin Console
+description: |
+  Alerts when a new behavior is reported when accessing the admin console app.
+references:
+  - 
+threat:
+  Tactic:
+    - 
+  Technique:
+    - T1
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where %"eventType" = "policy.evaluate_sign_on"
+    | json field=_raw "target[0].displayName" as clientName
+    | json field=_raw "target[1].displayName" as appInstance | where target contains "Okta Admin Console"
+    | json field=_raw "target[3].displayName" as authPolicy
+    | json field=_raw "debugContext.debugData.logOnlySecurityData" as securityData | where securityData contains "POSITIVE"
+    | json field=%"debugContext.debugData.logOnlySecurityData" "behaviors"
+    | json field=behaviors "New Geo-Location" as New_Geo_Location
+    | json field=behaviors "New City" as New_City
+    | json field=behaviors "Velocity"
+    | json field=behaviors "New Country" as New_Country
+    | json field=behaviors "New State" as New_State
+    | json field=behaviors "New IP" as New_IP
+    | json field=behaviors "New Device" as New_Device
+    | json field=_raw "client.userAgent.os" as os
+    | json field=_raw "client.ipAddress" as IPAddress 
+    | json field=_raw "client.geographicalContext.country" as country
+    | json field=_raw "client.geographicalContext.state" as state
+    | json field=_raw "client.geographicalContext.city" as city
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "device.os_platform" as OS
+    | json field=_raw "outcome.result" as outcomeResult 
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, clientName, appInstance, authPolicy, _source, outcomeResult, New_Geo_Location, Velocity, New_Device, os, New_IP, IPAddress, New_Country, country, New_State, state, New_City, city
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and debugContext.debugData.behaviors co "POSITIVE"
+    eventType eq "policy.evaluate_sign_on" and target.displayName eq "Okta Admin Console" and debugContext.debugData.LogOnlySecurityData co "POSITIVE"
+false_positives:
+  - Legitimate new behavior when the admin console is accessed.
