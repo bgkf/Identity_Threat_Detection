@@ -1,0 +1,34 @@
+title: Rejected MFA Pushes
+description: |
+  Detects when a MFA push is rejected by the user.
+references:
+  - 
+threat:
+  Tactic:
+    - 
+  Technique:
+    - T
+prevention:
+  D3fend:
+    - 
+detection:
+  sumologic_log_search: |
+    (_source=Okta or _source="Okta Preview")
+
+    // Extract core fields
+    | json field=_raw "eventType" as eventType | where eventType = "user.authentication.auth_via_mfa" 
+    | json field=_raw "debugContext.debugData.pushOnlyResponseType" as pushResponse | where pushResponse = "OV_RESPONSE_DENY"
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "outcome.result" as outcomeResult
+    | json field=_raw "outcome.resason" as outcomeReason
+    | formatDate(_messageTime, "MM/dd/yyyy HH:mm zzz") as timestamp
+
+    // Output summary
+    | count by timestamp, actor_ID, actor_displayName, eventType, pushResponse, _source, outcomeResult, outcomeReason
+    | sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "user.authentication.auth_via_mfa" and debugContext.debugData.pushOnlyResponseType eq "OV_RESPONSE_DENY"
+false_positives:
+  - 
