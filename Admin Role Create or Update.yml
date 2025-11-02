@@ -2,13 +2,17 @@ title: Admin Role Create or Update
 description: |
   Detects when an admin role is created or updated. 
 references:
-  - 
+  - https://help.okta.com/oie/en-us/content/topics/security/administrators-learn-about-admins.htm
 threat:
   Tactic:
-    - 
+    - TA0004: Privilege Escalation
   Technique:
-    - T1
+    - T1078: Valid Accounts
+    - T1098: Account Manipulation
 prevention:
+  Mitigation:
+    - M1032: Multi-factor Authentication
+    - M1018: User Account Management
   D3fend:
     - 
 detection:
@@ -33,4 +37,4 @@ detection:
   okta_systemlog_query: |
     eventType eq iam.role.update or eventType eq iam.role.create
 false_positives:
-  - 
+  - Legitimate admin role change.
