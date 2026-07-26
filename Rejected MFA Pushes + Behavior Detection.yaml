@@ -1,0 +1,60 @@
+title: Rejected MFA Pushes + Behavior Detection
+description: |
+  Detects when a MFA push is rejected by the user and the user's behavior has changed.
+references:
+  - 
+threat:
+  Tactic:
+    - TA0006: Credential Access
+  Technique:
+    - T1621: Multi-Factor Authentication Request Generation
+prevention:
+  D3fend:
+    - D3-AA (Agent Authentication)
+    - D3-CH (Credential Hardening)
+detection:
+  sumologic_log_search: |
+    _sourceCategory=*okta* ("OV_RESPONSE_DENY" or "send_factor_verify_push")
+| join
+  (
+    _sourceCategory=*okta* "OV_RESPONSE_DENY"
+    | json field=_raw "eventType" as eventType | where eventType = "user.authentication.auth_via_mfa"
+    | json field=_raw "debugContext.debugData.pushOnlyResponseType" as pushResponse | where pushResponse = "OV_RESPONSE_DENY"
+    | json field=_raw "debugContext.debugData.factor" as factor
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "actor.displayName" as actor_displayName
+    | json field=_raw "outcome.result" as outcomeResult
+    | where outcomeResult = "FAILURE"
+    | _messagetime as denyEpoch
+  ) as denied,
+  (
+    _sourceCategory=*okta* "send_factor_verify_push"
+    | json field=_raw "eventType" as eventType | where eventType = "system.push.send_factor_verify_push"
+    | json field=_raw "actor.alternateId" as actor_ID
+    | json field=_raw "securityContext.risk.level" as riskLevel
+    | json field=_raw "securityContext.userBehaviors" as behaviors
+    | parse regex field=behaviors "\"name\":\s*\"New Device\"[\s\S]*?\"result\":\s*\"(?<newDeviceResult>[A-Z]+)\"" nodrop
+    | parse regex field=behaviors "\"name\":\s*\"Velocity\"[\s\S]*?\"result\":\s*\"(?<velocityResult>[A-Z]+)\"" nodrop
+    | parse regex field=behaviors "\"name\":\s*\"New Geo-Location\"[\s\S]*?\"result\":\s*\"(?<newGeoResult>[A-Z]+)\"" nodrop
+    | parse regex field=behaviors "\"name\":\s*\"New ASN\"[\s\S]*?\"result\":\s*\"(?<newASNResult>[A-Z]+)\"" nodrop
+    | _messagetime as sendEpoch
+  ) as ctx
+  on denied.actor_ID = ctx.actor_ID
+
+// keep only the nearest preceding send event per deny
+| denied_denyEpoch - ctx_sendEpoch as diffMs
+| where diffMs >= 0 and diffMs <= 30000
+| sort by diffMs asc
+| dedup denied_denyEpoch
+
+// only alert if risk/behavior data actually looks suspicious
+| where ctx_riskLevel != "LOW" or ctx_newDeviceResult = "POSITIVE" or ctx_velocityResult = "POSITIVE" or ctx_newGeoResult = "POSITIVE" or ctx_newASNResult = "POSITIVE"
+
+| formatDate(denied_denyEpoch, "MM/dd/yyyy HH:mm zzz") as timestamp
+| count by timestamp, denied_actor_ID, denied_actor_displayName, denied_eventType, denied_pushResponse, denied_factor, denied_outcomeResult, ctx_riskLevel, ctx_newDeviceResult, ctx_velocityResult, ctx_newGeoResult, ctx_newASNResult
+| sort by timestamp desc
+
+  okta_systemlog_query: |
+    eventType eq "user.authentication.auth_via_mfa" and debugContext.debugData.pushOnlyResponseType eq "OV_RESPONSE_DENY"
+false_positives:
+  - Legitimate push generated and rejected by user.
